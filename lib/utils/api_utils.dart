@@ -3,6 +3,7 @@ import 'package:mobile_3plwinner/providers/api_locationreport_taskid_provider.da
 import '../services/api_service.dart';
 import '../providers/api_key_provider.dart';
 import '../providers/api_upcreport_taskid_provider.dart';
+import '../providers/api_user_credentials_provider.dart';
 import 'package:provider/provider.dart';
 
 
@@ -23,7 +24,10 @@ Future<Map<String, dynamic>?> handleSignIn(
       final apiKeyProvider =
           Provider.of<ApiKeyProvider>(context, listen: false);
       apiKeyProvider.setApiKey(apiKey);
-
+      final apiUserCredentialsProvider =
+          Provider.of<ApiUserCredentialsProvider>(context, listen: false);
+      apiUserCredentialsProvider.setUsername(username);
+      apiUserCredentialsProvider.setPassword(password);
       final upcReportTaskId = await handleGetTaskId(context, 'upcs');
       final locationReportTaskId = await handleGetTaskId(context, 'Locations');
 

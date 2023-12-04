@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'screens/login_screen.dart';
-import 'screens/receiving_screen.dart';
+import 'package:mobile_3plwinner/screens/dashboard.dart';
+import 'package:mobile_3plwinner/screens/receiving_screen.dart';
 import 'providers/api_key_provider.dart';
 import 'providers/api_upcreport_taskid_provider.dart';
 import 'providers/api_locationreport_taskid_provider.dart';
+import 'providers/api_user_credentials_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -26,6 +27,9 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(
             create: (_) => ApiLocationReportTaskIdProvider(),
           ),
+          ChangeNotifierProvider(
+            create: (_) => ApiUserCredentialsProvider(),
+          ),
       ],
        //create an instance of the provider
       child: MaterialApp(
@@ -33,7 +37,8 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: LoginScreen(),
+        home: DashboardScreen(),
+        // LoginScreen(),
         routes: {
           '/receiving': (context) => ReceivingScreen(),
         },

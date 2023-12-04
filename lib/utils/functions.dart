@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'api_utils.dart';
 import 'package:intl/intl.dart';
+import '../providers/api_user_credentials_provider.dart';
+import 'package:provider/provider.dart';
 
 Future<String> findProduct(BuildContext context, String upc, String zone,
     String locationId, int quantity) async {
@@ -32,7 +34,8 @@ Future<String> findProduct(BuildContext context, String upc, String zone,
   if (foundProduct != null && foundLocation != null) {
     print('into receiving mode');
     String currentTime = getFormattedUtcDateTime();
-
+    final username = Provider.of<ApiUserCredentialsProvider>(context, listen: false).username;
+    final password = Provider.of<ApiUserCredentialsProvider>(context, listen: false).password;
     final receivingAlert = await handlePostReceiving(
         context,
         foundLocation['Aisle'],
@@ -42,8 +45,8 @@ Future<String> findProduct(BuildContext context, String upc, String zone,
         quantity,
         foundProduct['cusId'],
         foundProduct['productId'],
-        'jorge',
-        'jorge',
+        username!,
+        password!,
         currentTime);
 
     ScaffoldMessenger.of(context).showSnackBar(

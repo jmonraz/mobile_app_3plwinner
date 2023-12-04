@@ -11,17 +11,36 @@ class ReceivingScreen extends StatefulWidget {
 }
 
 class _ReceivingScreenState extends State<ReceivingScreen> {
+    final FocusNode _focusNode = FocusNode();
     final _formKey = GlobalKey<FormState>(); // GlobalKey for the form
     final TextEditingController _productUpcController = TextEditingController();
     final TextEditingController _productQuantityController = TextEditingController();
     final TextEditingController _productZoneController = TextEditingController();
     final TextEditingController _productLocationController = TextEditingController();
     bool isLoading = false;
+    bool shouldFocus = true;
 
     @override
     void initState() {
       super.initState();
       _productZoneController.text = 'Bins';
+      _productQuantityController.text = '1';
+
+      WidgetsBinding.instance.addPostFrameCallback((_){
+          if (shouldFocus) {
+            FocusScope.of(context).requestFocus(_focusNode);
+          }
+      });
+    }
+
+    @override
+    void dispose() {
+      _productUpcController.dispose();
+      _productQuantityController.dispose();
+      _productZoneController.dispose();
+      _productLocationController.dispose();
+      _focusNode.dispose();
+      super.dispose();
     }
 
     @override
@@ -49,10 +68,11 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                     hintText: 'UPC',
                     controller: _productUpcController,
                     keyboardType: TextInputType.text,
-
+                    focusNode: _focusNode,
                   ),
                   const SizedBox(height: 8.0),
                   Input(
+                    enabled: false,
                     hintText: 'Quantity',
                     controller: _productQuantityController,
                     keyboardType: TextInputType.number,
@@ -89,7 +109,6 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                               setState(() {
                                 isLoading = false;
                                 _productUpcController.text = '';
-                                _productQuantityController.text = '';
                                 _productLocationController.text = '';
                               });
                             } else {

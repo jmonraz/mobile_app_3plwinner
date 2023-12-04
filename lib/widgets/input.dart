@@ -7,6 +7,7 @@ class Input extends StatelessWidget {
   final bool enabled;
   final bool obscureText;
   final Icon? prefixIcon;
+  final FocusNode? focusNode;
 
   const Input ({super.key,
     required this.hintText,
@@ -15,6 +16,7 @@ class Input extends StatelessWidget {
     this.prefixIcon,
     this.enabled = true,
     this.obscureText = false,
+    this.focusNode,
   });
 
   @override
@@ -23,6 +25,7 @@ class Input extends StatelessWidget {
     obscureText: obscureText,
     controller: controller,
     keyboardType: keyboardType,
+    focusNode: focusNode,
     validator: (value) {
       if (value == null || value.isEmpty) {
         return 'This field is required.';
