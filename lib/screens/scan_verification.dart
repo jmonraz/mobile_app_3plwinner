@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_3plwinner/widgets/ProductTile.dart';
 import 'package:mobile_3plwinner/widgets/input.dart';
 
 class ScanVerification extends StatefulWidget {
@@ -13,8 +14,7 @@ class _ScanVerificationState extends State<ScanVerification> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SingleChildScrollView(
-            child: Padding(
+        body: Padding(
       padding: const EdgeInsets.all(32.0),
       child: Column(
         children: [
@@ -27,9 +27,28 @@ class _ScanVerificationState extends State<ScanVerification> {
               color: Colors.blueGrey,
               size: 20.0,
             ),
+          ),
+          const SizedBox(height: 16.0),
+          Expanded(
+            child: ListView(
+              children: [
+                ProductTile(
+                    productName: 'Product A',
+                    numberOfLines: 4,
+                    totalQuantity: 1000),
+                ProductTile(
+                    productName: 'Product B',
+                    numberOfLines: 2,
+                    totalQuantity: 750),
+                ProductTile(
+                    productName: 'Product C',
+                    numberOfLines: 20,
+                    totalQuantity: 6000)
+              ],
+            ),
           )
         ],
       ),
-    )));
+    ));
   }
 }
