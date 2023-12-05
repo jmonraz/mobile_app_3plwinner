@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../widgets/input.dart';
 import '../widgets/button.dart';
 import '../utils/api_utils.dart';
-import '../providers/api_key_provider.dart';
 
 class LoginScreen extends StatefulWidget {
-  LoginScreen({super.key});
+  const LoginScreen({super.key});
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -24,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          color: Color(0xFAFAFA),
+          color: Color(0x00fafafa),
         ),
         height: MediaQuery.of(context).size.height,
         child: Center(
@@ -83,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             });
                             if (result != null) {
                               if (result['Error'] == null) {
-                                Navigator.pushNamed(context, '/receiving');
+                                Navigator.pushNamed(context, '/dashboard');
                               }
                               else {
                                 setState(() {
@@ -99,8 +97,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           }
                         },
                         child: isLoading
-                            ? CircularProgressIndicator()
-                            : Text('Sign In', style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white)),
+                            ? const CircularProgressIndicator()
+                            : const Text('Sign In', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white)),
                       ),
                     ],
                   ),
@@ -109,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Text(
                         errorMessage,
-                        style: TextStyle(color: Colors.red),
+                        style: const TextStyle(color: Colors.red),
                       ),
                     ),
                 ],

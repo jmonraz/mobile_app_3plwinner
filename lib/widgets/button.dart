@@ -22,8 +22,9 @@ class Button extends StatelessWidget {
       backgroundColor: Colors.blueGrey,
     ).copyWith(overlayColor: MaterialStateProperty.resolveWith<Color?>(
           (Set<MaterialState> states) {
-        if (states.contains(MaterialState.pressed))
+        if (states.contains(MaterialState.pressed)) {
           return Colors.blueGrey[900];
+        }
         return null; // Defer to the widget's default.
       },
     )),

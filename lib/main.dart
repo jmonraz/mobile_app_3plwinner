@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_3plwinner/screens/dashboard.dart';
+import 'package:mobile_3plwinner/screens/login_screen.dart';
 import 'package:mobile_3plwinner/screens/receiving_screen.dart';
 import 'providers/api_key_provider.dart';
 import 'providers/api_upcreport_taskid_provider.dart';
@@ -37,10 +38,11 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: DashboardScreen(),
+        home: const LoginScreen(),
         // LoginScreen(),
         routes: {
-          '/receiving': (context) => ReceivingScreen(),
+          '/dashboard': (context) => const DashboardScreen(),
+          '/receiving': (context) => const ReceivingScreen(),
         },
         debugShowCheckedModeBanner: false,
       ),

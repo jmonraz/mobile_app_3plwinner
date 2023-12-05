@@ -48,7 +48,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
       return
       Scaffold(
         body:
-        Container(
+        SizedBox(
           height: MediaQuery.of(context).size.height,
           child: Center(
             child:
@@ -118,7 +118,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                             }
                           }
                         },
-                        child: isLoading ? CircularProgressIndicator(): const Text('Receive Product', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white)),
+                        child: isLoading ? const CircularProgressIndicator(): const Text('Receive Product', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white)),
                       )
                     ],
                   ),

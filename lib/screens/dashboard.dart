@@ -9,14 +9,20 @@ class DashboardScreen extends StatelessWidget {
     return Scaffold(
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
-        child: const Padding(
-          padding: EdgeInsets.all(32.0),
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Tile(
                 title: 'Receiving',
+                onTap: () { Navigator.pushNamed(context, '/receiving'); },
+              ),
+              const SizedBox(height: 16.0),
+              Tile(
+                title: 'Scan Verification',
+                onTap: () { Navigator.pushNamed(context, '/scan_verification'); },
               )
             ],
           ),

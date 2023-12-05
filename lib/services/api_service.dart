@@ -107,7 +107,7 @@ class ApiService {
       String password,
       String receiptDate) async {
     final response = await http.post(
-      Uri.parse('$baseUrl'),
+      Uri.parse(baseUrl),
       headers: <String, String>{
         'Content-Type': 'application/json',
       },

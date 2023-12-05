@@ -57,11 +57,11 @@ Future<String> findProduct(BuildContext context, String upc, String zone,
   } else {
     if(foundProduct == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Product not found!')),
+        const SnackBar(content: Text('Product not found!')),
       );
     } else if(foundLocation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Location not found!')),
+        const SnackBar(content: Text('Location not found!')),
       );
     }
     return 'Product not found or location not found!';
