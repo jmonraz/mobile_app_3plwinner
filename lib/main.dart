@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_3plwinner/screens/dashboard.dart';
 import 'package:mobile_3plwinner/screens/login_screen.dart';
 import 'package:mobile_3plwinner/screens/receiving_screen.dart';
+import 'package:mobile_3plwinner/screens/scan_verification.dart';
 import 'providers/api_key_provider.dart';
 import 'providers/api_upcreport_taskid_provider.dart';
 import 'providers/api_locationreport_taskid_provider.dart';
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/dashboard': (context) => const DashboardScreen(),
           '/receiving': (context) => const ReceivingScreen(),
+          '/scan_verification': (context) => const ScanVerification(),
         },
         debugShowCheckedModeBanner: false,
       ),
