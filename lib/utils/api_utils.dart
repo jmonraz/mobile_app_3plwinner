@@ -55,21 +55,14 @@ Future<Map<String, dynamic>?> handleSignIn(
   return result;
 }
 
-Future<Map<String, dynamic>> handleGetScanVerificationReports(
+Future<String?> handleGetScanVerificationReports(
     BuildContext context) async {
   final warehouseInventoryDetailTaskId =
       await handleGetTaskId(context, 'Warehouse Inventory Detail');
   final unshippedPickSlipsTaskId =
       await handleGetTaskId(context, 'unshipped pick slips');
 
-  final warehouseInventoryDetailReport =
-      await handleGetReport(context, 'Warehouse Inventory Detail');
-  print('API Response from getWarehouseInventoryDetailReport: $warehouseInventoryDetailReport');
-  final unshippedPickSlipsReport =
-      await handleGetReport(context, 'unshipped pick slips');
-  print('API Response from getUnshippedPickSlipsReport: $unshippedPickSlipsReport');
-
-  return warehouseInventoryDetailReport;
+  return 'Reports generated!';
 }
 
 Future<String?> handleGetTaskId(BuildContext context, String reportName) async {

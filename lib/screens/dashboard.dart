@@ -27,6 +27,7 @@ class DashboardScreen extends StatelessWidget {
               title: 'Scan Verification',
               onTap: () async {
                 final response = await handleGetScanVerificationReports(context);
+                print(response);
                 Navigator.pushNamed(context, '/scan_verification');
               },
             )

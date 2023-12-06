@@ -31,9 +31,9 @@ class _ProductTileState extends State<ProductTile> {
         child: Column(
           children: [
             ListTile(
-              title: Text(widget.productName),
+              title: Text(widget.productName, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22.0, color: Colors.blueGrey),),
               subtitle: Text(
-                  '${widget.numberOfLines} lines\n${widget.totalQuantity} total'),
+                  '0 of ${widget.numberOfLines} lines completed\n${widget.totalQuantity} total', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold,),),
             ),
             if (isExpanded)
               Column(

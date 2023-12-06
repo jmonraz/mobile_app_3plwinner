@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_3plwinner/widgets/ProductTile.dart';
+import 'package:mobile_3plwinner/widgets/product_tile.dart';
 import 'package:mobile_3plwinner/widgets/button.dart';
 import 'package:mobile_3plwinner/widgets/input.dart';
 

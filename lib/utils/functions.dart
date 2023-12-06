@@ -73,3 +73,24 @@ String getFormattedUtcDateTime() {
   final formatter = DateFormat('yyyy-MM-ddTHH:mm:ss');
   return formatter.format(currentUtcDate);
 }
+
+Future<String> findPickSlip(BuildContext context, String pickSlip) async {
+    final pickSlipsResponse = await handleGetReport(context, 'unshipped pick slips');
+    final warehouseInventoryResponse = await handleGetReport(context, 'Warehouse Inventory Detail');
+
+    Map<String, dynamic>? foundPickSlip;
+    Map<String, dynamic>? foundInventory;
+
+    String? newPickSlip = pickSlip.substring(1);
+
+    // find pick slip in the list of pick slips
+    for (var ps in pickSlipsResponse['Data']) {
+      if (ps['Pick Slip'] == newPickSlip) {
+        foundPickSlip = ps;
+        print('found pick slip: $ps');
+        break;
+      }
+    }
+
+    return 'ok';
+}
