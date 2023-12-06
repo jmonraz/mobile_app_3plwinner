@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_3plwinner/providers/api_unshipped_pick_slips_taskid_provider.dart';
+import 'package:mobile_3plwinner/providers/api_warehouse_inventory_detail_taskid_provider.dart';
 import 'package:mobile_3plwinner/screens/dashboard.dart';
 import 'package:mobile_3plwinner/screens/login_screen.dart';
 import 'package:mobile_3plwinner/screens/receiving_screen.dart';
@@ -18,22 +20,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return
-      MultiProvider(providers:  [
-          ChangeNotifierProvider(
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
           create: (_) => ApiKeyProvider(),
         ),
-          ChangeNotifierProvider(
+        ChangeNotifierProvider(
           create: (_) => ApiUPCReportTaskIdProvider(),
         ),
-          ChangeNotifierProvider(
-            create: (_) => ApiLocationReportTaskIdProvider(),
-          ),
-          ChangeNotifierProvider(
-            create: (_) => ApiUserCredentialsProvider(),
-          ),
+        ChangeNotifierProvider(
+          create: (_) => ApiLocationReportTaskIdProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ApiUserCredentialsProvider(),
+        ),
+        ChangeNotifierProvider(
+            create: (_) => ApiUnshippedPickSlipsTaskIdProvider()),
+        ChangeNotifierProvider(
+            create: (_) => ApiWarehouseInventoryDetailTaskIdProvider()),
       ],
-       //create an instance of the provider
+      //create an instance of the provider
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
@@ -51,4 +57,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
