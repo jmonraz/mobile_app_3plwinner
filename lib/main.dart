@@ -38,10 +38,16 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
+<<<<<<< HEAD
         home: const LoginScreen(),
         // LoginScreen(),
         routes: {
           '/dashboard': (context) => const DashboardScreen(),
+=======
+        home: const DashboardScreen(),
+        // LoginScreen(),
+        routes: {
+>>>>>>> 15c7e10 (commit)
           '/receiving': (context) => const ReceivingScreen(),
         },
         debugShowCheckedModeBanner: false,
