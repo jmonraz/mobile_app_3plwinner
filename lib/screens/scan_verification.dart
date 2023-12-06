@@ -33,7 +33,6 @@ class _ScanVerificationState extends State<ScanVerification> {
     print(groupedProducts);
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,35 +53,64 @@ class _ScanVerificationState extends State<ScanVerification> {
                       color: Colors.blueGrey,
                       size: 20.0,
                     ),
-                  ),
-                  const SizedBox(height: 16.0),
-                  isLoading ? const CircularProgressIndicator() :
-                  Button(
-                      text: 'Verify Pick Slip',
-                      onPressed: () async {
-                        setState(() {
-                          isLoading = true;
-                        });
-                        if (_pickSlipController.text.isEmpty) {
-                          setState(() {
-                            isLoading = false;
-                            errorMessage = 'Please enter a pick slip';
-                          });
-                          return;
-                        }
-                        pickSlipData = (await findPickSlip(context, _pickSlipController.text))!;
+                    onSubmitted: (value) async {
+                      setState(() {
+                        isLoading = true;
+                        errorMessage = '';
+                      });
+                      if (_pickSlipController.text.isEmpty) {
                         setState(() {
                           isLoading = false;
+                          errorMessage = 'Please enter a pick slip';
                         });
-                        if(pickSlipData.isNotEmpty) {
-                          groupProducts();
-                          setState(() {
-                            pickSlipFound = true;
-                            errorMessage = '';
-                          });
-                        }
-                      },
-                      child: const Text('Verify Pick Slip')),
+                        return;
+                      }
+                      pickSlipData =
+                      (await findPickSlip(context, _pickSlipController.text))!;
+                      setState(() {
+                        isLoading = false;
+                      });
+                      if (pickSlipData.isNotEmpty) {
+                        groupProducts();
+                        setState(() {
+                          pickSlipFound = true;
+                          errorMessage = '';
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16.0),
+                  isLoading
+                      ? const CircularProgressIndicator()
+                      : Button(
+                          text: 'Verify Pick Slip',
+                          onPressed: () async {
+                            setState(() {
+                              isLoading = true;
+                              errorMessage = '';
+                            });
+                            if (_pickSlipController.text.isEmpty) {
+                              setState(() {
+                                isLoading = false;
+                                errorMessage = 'Please enter a pick slip';
+                              });
+                              return;
+                            }
+                            pickSlipData = (await findPickSlip(
+                                context, _pickSlipController.text))!;
+                            setState(() {
+                              isLoading = false;
+                            });
+                            if (pickSlipData.isNotEmpty) {
+                              groupProducts();
+                              setState(() {
+                                pickSlipFound = true;
+                                errorMessage = '';
+                              });
+                            }
+                          },
+                          child: const Text('Verify Pick Slip',
+                              style: TextStyle(color: Colors.white))),
                   if (errorMessage.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
@@ -106,9 +134,15 @@ class _ScanVerificationState extends State<ScanVerification> {
                         color: Colors.blueGrey,
                         size: 20.0,
                       ),
+                      onSubmitted: (value) {
+                        print('upc: $value');
+                        setState(() {
+                          _upcController.text = '';
+                        });
+                      },
                     ),
                     const SizedBox(height: 16.0),
-                    Text('Pick Slip: ${pickSlipData['pickSlipId']}'),
+                    Text('Pick Slip: ${pickSlipData['pickSlipId']}', style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.blueGrey)),
                     Flexible(
                       child: ListView(
                         children: [
@@ -129,4 +163,3 @@ class _ScanVerificationState extends State<ScanVerification> {
     );
   }
 }
-

@@ -147,6 +147,27 @@ Future<Map<String, dynamic>?> findPickSlip(BuildContext context, String pickSlip
       }
     }
   }
-  print(mappedPickSlip);
+
+  // add upc property to each product in the mappedPickSlip
+  for(var p in mappedPickSlip['products']) {
+    p['upc'] = await findProductByProductId(context, p['productId']);
+  }
+
+  print('mappedPickSlip: $mappedPickSlip');
   return mappedPickSlip;
+}
+
+Future<String> findProductByProductId(BuildContext context, String productId) async {
+  final productsResponse = await handleGetReport(context, 'upcs');
+
+  Map<String, dynamic>? foundProduct;
+
+  for (var p in productsResponse['Data']) {
+    if(p['productId'] == productId) {
+      foundProduct = p;
+      break;
+    }
+  }
+
+  return foundProduct!['UPC'];
 }

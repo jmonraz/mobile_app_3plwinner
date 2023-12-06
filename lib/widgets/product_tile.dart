@@ -66,6 +66,7 @@ class _ProductTileState extends State<ProductTile> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
+                                        Text('Unit ID: ${widget.productList[index]['unitId']}'),
                                         Text('Total quantity: ${widget.productList[index]['quantity']}'),
                                         Text('Verified? No'),
                                       ],

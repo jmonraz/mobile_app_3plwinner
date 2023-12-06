@@ -8,6 +8,7 @@ class Input extends StatelessWidget {
   final bool obscureText;
   final Icon? prefixIcon;
   final FocusNode? focusNode;
+  final void Function(String?)? onSubmitted;
 
   const Input ({super.key,
     required this.hintText,
@@ -17,10 +18,12 @@ class Input extends StatelessWidget {
     this.enabled = true,
     this.obscureText = false,
     this.focusNode,
+    this.onSubmitted,
   });
 
   @override
   Widget build(BuildContext context) => TextFormField(
+    onFieldSubmitted: onSubmitted,
     enabled: enabled,
     obscureText: obscureText,
     controller: controller,
