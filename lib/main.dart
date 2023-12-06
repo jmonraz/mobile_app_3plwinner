@@ -50,6 +50,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/receiving': (context) => const ReceivingScreen(),
           '/scan_verification': (context) => const ScanVerification(),
+          '/dashboard': (context) => const DashboardScreen(),
         },
         debugShowCheckedModeBanner: false,
       ),

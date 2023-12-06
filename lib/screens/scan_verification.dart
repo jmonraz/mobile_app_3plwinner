@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_3plwinner/utils/functions.dart';
 import 'package:mobile_3plwinner/widgets/product_tile.dart';
 import 'package:mobile_3plwinner/widgets/button.dart';
 import 'package:mobile_3plwinner/widgets/input.dart';
@@ -15,20 +16,23 @@ class _ScanVerificationState extends State<ScanVerification> {
   final TextEditingController _pickSlipController = TextEditingController();
   bool pickSlipFound = false;
   bool isLoading = false;
-  final String errorMessage = '';
+  Map<String, dynamic> pickSlipData = {};
+  String errorMessage = '';
 
-  void verifyPickSlip() {
-    setState(() {
-      isLoading = true;
-    });
-    // perform search algorithm to find pick slip
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        pickSlipFound = true;
-        isLoading = false;
-      });
-    });
+  // group products by productId
+  Map<String, List<Map<String, dynamic>>> groupedProducts = {};
+
+  void groupProducts() {
+    for (var product in pickSlipData['products']) {
+      if (groupedProducts.containsKey(product['productId'])) {
+        groupedProducts[product['productId']]!.add(product);
+      } else {
+        groupedProducts[product['productId']] = [product];
+      }
+    }
+    print(groupedProducts);
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -55,14 +59,38 @@ class _ScanVerificationState extends State<ScanVerification> {
                   isLoading ? const CircularProgressIndicator() :
                   Button(
                       text: 'Verify Pick Slip',
-                      onPressed: () {
-                        verifyPickSlip();
+                      onPressed: () async {
+                        setState(() {
+                          isLoading = true;
+                        });
+                        if (_pickSlipController.text.isEmpty) {
+                          setState(() {
+                            isLoading = false;
+                            errorMessage = 'Please enter a pick slip';
+                          });
+                          return;
+                        }
+                        pickSlipData = (await findPickSlip(context, _pickSlipController.text))!;
+                        setState(() {
+                          isLoading = false;
+                        });
+                        if(pickSlipData.isNotEmpty) {
+                          groupProducts();
+                          setState(() {
+                            pickSlipFound = true;
+                            errorMessage = '';
+                          });
+                        }
                       },
                       child: const Text('Verify Pick Slip')),
-                  Text(
-                    errorMessage,
-                    style: const TextStyle(color: Colors.red),
-                  ),
+                  if (errorMessage.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        errorMessage,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    ),
                 ],
               ),
             if (pickSlipFound)
@@ -80,21 +108,15 @@ class _ScanVerificationState extends State<ScanVerification> {
                       ),
                     ),
                     const SizedBox(height: 16.0),
+                    Text('Pick Slip: ${pickSlipData['pickSlipId']}'),
                     Flexible(
                       child: ListView(
                         children: [
-                          ProductTile(
-                              productName: 'Product A',
-                              numberOfLines: 4,
-                              totalQuantity: 1000),
-                          ProductTile(
-                              productName: 'Product B',
-                              numberOfLines: 2,
-                              totalQuantity: 750),
-                          ProductTile(
-                              productName: 'Product C',
-                              numberOfLines: 20,
-                              totalQuantity: 6000)
+                          for (var product in groupedProducts.entries)
+                            ProductTile(
+                              productId: product.key,
+                              productList: product.value,
+                            )
                         ],
                       ),
                     ),
@@ -107,3 +129,4 @@ class _ScanVerificationState extends State<ScanVerification> {
     );
   }
 }
+

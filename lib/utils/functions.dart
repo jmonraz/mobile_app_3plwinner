@@ -30,12 +30,15 @@ Future<String> findProduct(BuildContext context, String upc, String zone,
     }
   }
 
-
   if (foundProduct != null && foundLocation != null) {
     print('into receiving mode');
     String currentTime = getFormattedUtcDateTime();
-    final username = Provider.of<ApiUserCredentialsProvider>(context, listen: false).username;
-    final password = Provider.of<ApiUserCredentialsProvider>(context, listen: false).password;
+    final username =
+        Provider.of<ApiUserCredentialsProvider>(context, listen: false)
+            .username;
+    final password =
+        Provider.of<ApiUserCredentialsProvider>(context, listen: false)
+            .password;
     final receivingAlert = await handlePostReceiving(
         context,
         foundLocation['Aisle'],
@@ -50,16 +53,18 @@ Future<String> findProduct(BuildContext context, String upc, String zone,
         currentTime);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Successful Receipt {Receipt ID}: ${receivingAlert['ReceiptIDs'][0]}')),
+      SnackBar(
+          content: Text(
+              'Successful Receipt {Receipt ID}: ${receivingAlert['ReceiptIDs'][0]}')),
     );
 
     return 'Product received!';
   } else {
-    if(foundProduct == null) {
+    if (foundProduct == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Product not found!')),
       );
-    } else if(foundLocation == null) {
+    } else if (foundLocation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Location not found!')),
       );
@@ -74,23 +79,74 @@ String getFormattedUtcDateTime() {
   return formatter.format(currentUtcDate);
 }
 
-Future<String> findPickSlip(BuildContext context, String pickSlip) async {
-    final pickSlipsResponse = await handleGetReport(context, 'unshipped pick slips');
-    final warehouseInventoryResponse = await handleGetReport(context, 'Warehouse Inventory Detail');
+Future<Map<String, dynamic>?> findPickSlip(BuildContext context, String pickSlip) async {
+  final pickSlipsResponse =
+      await handleGetReport(context, 'unshipped pick slips');
+  final warehouseInventoryResponse =
+      await handleGetReport(context, 'Warehouse Inventory Detail');
 
-    Map<String, dynamic>? foundPickSlip;
-    Map<String, dynamic>? foundInventory;
+  Map<String, dynamic>? foundPickSlip;
+  Map<String, dynamic> mappedPickSlip = {};
 
-    String? newPickSlip = pickSlip.substring(1);
+  String? newPickSlip = pickSlip.substring(1);
 
-    // find pick slip in the list of pick slips
-    for (var ps in pickSlipsResponse['Data']) {
-      if (ps['Pick Slip'] == newPickSlip) {
-        foundPickSlip = ps;
-        print('found pick slip: $ps');
-        break;
+  // find pick slip in the list of pick slips
+  for (var ps in pickSlipsResponse['Data']) {
+    if (ps['Pick Slip ID'].toString() == newPickSlip) {
+      foundPickSlip = ps;
+      print('found pick slip: $ps');
+      break;
+    }
+  }
+
+  if (foundPickSlip == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Pick slip not found!')),
+    );
+    return {};
+  }
+
+  // format the foundPickSlip object
+  mappedPickSlip['pickSlipId'] = foundPickSlip['Pick Slip ID'];
+  mappedPickSlip['orderId'] = foundPickSlip['Order ID'];
+  mappedPickSlip['orderDate'] = foundPickSlip['Order Date'];
+  mappedPickSlip['products'] = [];
+
+  final productDetails = foundPickSlip['Product and Location Details'];
+  final decodedText = productDetails.replaceAll('&amp;', '&');
+  final productItems = decodedText.split('; ');
+  productItems.removeLast();
+
+  for (var item in productItems) {
+    final parts = item.split(', ');
+    final product = parts[0].split(': ')[1];
+    final location = parts[1].split(': ')[1];
+    final updatedLocation = location.split('*');
+    final zone = updatedLocation[0];
+    final aisle = updatedLocation[1];
+    final rack = updatedLocation[2];
+    final level = updatedLocation[3];
+    final quantity = parts[2].split(': ')[1];
+
+    mappedPickSlip['products'].add({
+      'productId': product,
+      'zone': zone,
+      'aisle': aisle,
+      'rack': rack,
+      'level': level,
+      'quantity': quantity
+    });
+  }
+
+  // add unit id property to each product in the mappedPickSlip
+  // find the unit id by comparing locations between the warehouse inventory report and the mappedPickSlip object
+  for(var id in warehouseInventoryResponse['Data']) {
+    for(var product in mappedPickSlip['products']) {
+      if(id['Aisle'] == product['aisle'] && id['Rack'] == product['rack'] && id['Level'] == product['level'] && id['Product ID'] == product['productId']) {
+        product['unitId'] = id['Unit ID'];
       }
     }
-
-    return 'ok';
+  }
+  print(mappedPickSlip);
+  return mappedPickSlip;
 }

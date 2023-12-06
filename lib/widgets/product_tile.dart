@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 
 class ProductTile extends StatefulWidget {
-  final String productName;
-  final int numberOfLines;
-  final int totalQuantity;
+  final String productId;
+  final List productList;
 
   const ProductTile(
-      {super.key,
-      required this.productName,
-      required this.numberOfLines,
-      required this.totalQuantity});
+      {super.key, required this.productId, required this.productList});
 
   @override
   State<ProductTile> createState() => _ProductTileState();
@@ -31,17 +27,27 @@ class _ProductTileState extends State<ProductTile> {
         child: Column(
           children: [
             ListTile(
-              title: Text(widget.productName, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22.0, color: Colors.blueGrey),),
+              title: Text(
+                '${widget.productId}',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18.0,
+                    color: Colors.blueGrey),
+              ),
               subtitle: Text(
-                  '0 of ${widget.numberOfLines} lines completed\n${widget.totalQuantity} total', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold,),),
+                '0 of ${widget.productList.length} lines completed',
+                style: TextStyle(
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             if (isExpanded)
               Column(
                 children: List.generate(
-                    widget.numberOfLines,
+                    widget.productList.length,
                     (index) => ListTile(
-                          title: Text(
-                              'Line ${index + 1} of ${widget.numberOfLines}',
+                          title: Text('Line ${index + 1} of ${widget.productList.length}',
                               style: const TextStyle(
                                   fontSize: 14.0, fontWeight: FontWeight.bold)),
                           subtitle: Column(
@@ -60,8 +66,7 @@ class _ProductTileState extends State<ProductTile> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                            'Total quantity: ${widget.totalQuantity}'),
+                                        Text('Total quantity: ${widget.productList[index]['quantity']}'),
                                         Text('Verified? No'),
                                       ],
                                     ),
