@@ -45,6 +45,11 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
 
     @override
     Widget build(BuildContext context) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (shouldFocus) {
+          FocusScope.of(context).requestFocus(_focusNode);
+        }
+      });
       return
       Scaffold(
         body:
