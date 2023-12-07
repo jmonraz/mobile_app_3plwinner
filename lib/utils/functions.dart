@@ -218,3 +218,14 @@ String verifyScannedQuantity(String scannedUnitId, String upc, String quantity, 
   }
   return 'incorrect quantity';
 }
+
+Map<String, List<Map<String, dynamic>>> updateVerifiedStatus(String scannedUnitId, String upc, String quantity, Map<String, List<Map<String, dynamic>>> productList) {
+  for (var product in productList.entries) {
+    for(var p in product.value) {
+      if(p['upc'].toString() == upc && p['unitId'].toString() == scannedUnitId && p['quantity'].toString() == quantity) {
+        p['verified'] = true;
+      }
+    }
+  }
+  return productList;
+}

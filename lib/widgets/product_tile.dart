@@ -14,6 +14,17 @@ class ProductTile extends StatefulWidget {
 class _ProductTileState extends State<ProductTile> {
   bool isExpanded = false;
 
+  // calculate number of verified lines
+  int get numberOfVerifiedLines {
+    int count = 0;
+    for (var product in widget.productList) {
+      if (product['verified']) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -35,7 +46,7 @@ class _ProductTileState extends State<ProductTile> {
                     color: Colors.blueGrey),
               ),
               subtitle: Text(
-                '${widget.productList[0]['upc']}\n0 of ${widget.productList.length} lines completed',
+                '${widget.productList[0]['upc']}\n$numberOfVerifiedLines of ${widget.productList.length} lines completed',
                 style: const TextStyle(
                   fontSize: 14.0,
                   fontWeight: FontWeight.bold,
@@ -57,7 +68,7 @@ class _ProductTileState extends State<ProductTile> {
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     border: Border.all(color: Colors.blueGrey),
-                                    color: widget.productList[index]['verified'] ? Colors.green : Colors.white,
+                                    color: widget.productList[index]['verified'] ? Colors.green[400] : Colors.white,
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(8.0)),
                                   ),
@@ -67,9 +78,9 @@ class _ProductTileState extends State<ProductTile> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text('Unit ID: ${widget.productList[index]['unitId']}'),
-                                        Text('Total quantity: ${widget.productList[index]['quantity']}'),
-                                        Text('Verified: ${widget.productList[index]['verified']}'),
+                                        Text('Unit ID: ${widget.productList[index]['unitId']}', style: TextStyle(color: widget.productList[index]['verified'] ? Colors.white : Colors.black),),
+                                        Text('Total quantity: ${widget.productList[index]['quantity']}', style: TextStyle(color: widget.productList[index]['verified'] ? Colors.white : Colors.black),),
+                                        Text('Verified: ${widget.productList[index]['verified']}', style: TextStyle(color: widget.productList[index]['verified'] ? Colors.white : Colors.black),),
                                       ],
                                     ),
                                   ))
