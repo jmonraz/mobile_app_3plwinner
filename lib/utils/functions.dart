@@ -88,7 +88,13 @@ Future<Map<String, dynamic>?> findPickSlip(BuildContext context, String pickSlip
   Map<String, dynamic>? foundPickSlip;
   Map<String, dynamic> mappedPickSlip = {};
 
-  String? newPickSlip = pickSlip.substring(1);
+
+  String? newPickSlip;
+  if (pickSlip.startsWith('M') || pickSlip.startsWith('m')) {
+    newPickSlip = pickSlip.substring(1);
+  } else {
+    newPickSlip = pickSlip;
+  }
 
   // find pick slip in the list of pick slips
   for (var ps in pickSlipsResponse['Data']) {
@@ -153,7 +159,7 @@ Future<Map<String, dynamic>?> findPickSlip(BuildContext context, String pickSlip
 
   // add upc property to each product in the mappedPickSlip
   final productIds = mappedPickSlip['products'].map((e) => e['productId']).toSet().toList();
-
+  print('productIds: $productIds');
   // fetch 'upc' values for the product IDs in batches
   final upcsMap = await findProductByProductIds(context, productIds);
   print('upcsMap: $upcsMap');
@@ -173,11 +179,18 @@ Future<Map<String, String>> findProductByProductIds(BuildContext context, List<d
   final Map<String, String> upcsMap = {};
 
   for(var p in productsResponse['Data']) {
+
     final productId = p['productId'];
     final upc = p['UPC'];
 
     if (productIds.contains(productId)) {
-      upcsMap[productId] = upc;
+      if(upc == null) {
+        upcsMap[productId] = 'no upc in system';
+        continue;
+      } else {
+        upcsMap[productId] = upc;
+      }
+
     }
   }
   return upcsMap;
@@ -195,6 +208,10 @@ String findScannedUpc(String scannedUpc, Map<String, List<Map<String, dynamic>>>
 }
 
 String verifyScannedUnitId(String scannedUnitId, String upc, Map<String, List<Map<String, dynamic>>> productList) {
+  if(scannedUnitId.startsWith('N') || scannedUnitId.startsWith('n')) {
+    scannedUnitId = scannedUnitId.substring(1);
+  }
+
   for (var product in productList.entries) {
     for(var p in product.value) {
       if(p['upc'].toString() == upc && p['unitId'].toString() == scannedUnitId) {

@@ -25,6 +25,14 @@ class _ProductTileState extends State<ProductTile> {
     return count;
   }
 
+  bool get isCompleted {
+    if (numberOfVerifiedLines == widget.productList.length) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -40,16 +48,17 @@ class _ProductTileState extends State<ProductTile> {
             ListTile(
               title: Text(
                 widget.productId,
-                style: const TextStyle(
+                style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18.0,
-                    color: Colors.blueGrey),
+                    color: !isCompleted ? Colors.blueGrey : Colors.green[400]),
               ),
               subtitle: Text(
-                '${widget.productList[0]['upc']}\n$numberOfVerifiedLines of ${widget.productList.length} lines completed',
-                style: const TextStyle(
+                '${widget.productList[0]['upc']}\n$numberOfVerifiedLines of ${widget.productList.length} lines completed\nCompleted: $isCompleted',
+                style: TextStyle(
                   fontSize: 14.0,
                   fontWeight: FontWeight.bold,
+                  color: !isCompleted ? Colors.black : Colors.green[400],
                 ),
               ),
             ),
