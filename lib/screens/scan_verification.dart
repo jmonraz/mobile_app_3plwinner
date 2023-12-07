@@ -14,10 +14,20 @@ class ScanVerification extends StatefulWidget {
 class _ScanVerificationState extends State<ScanVerification> {
   final TextEditingController _upcController = TextEditingController();
   final TextEditingController _pickSlipController = TextEditingController();
+  final TextEditingController _unitIdController = TextEditingController();
+  final TextEditingController _quantityController = TextEditingController();
+
   bool pickSlipFound = false;
   bool isLoading = false;
+  bool isDialogOpen = false;
+
   Map<String, dynamic> pickSlipData = {};
   String errorMessage = '';
+
+  // current upc being scanned
+  String currentScannedUpc = '';
+  String currentScannedUnitId = '';
+  String unitIdMessage = '';
 
   // group products by productId
   Map<String, List<Map<String, dynamic>>> groupedProducts = {};
@@ -30,7 +40,6 @@ class _ScanVerificationState extends State<ScanVerification> {
         groupedProducts[product['productId']] = [product];
       }
     }
-    print(groupedProducts);
   }
 
   @override
@@ -39,7 +48,6 @@ class _ScanVerificationState extends State<ScanVerification> {
       body: Padding(
         padding: const EdgeInsets.all(32.0),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             if (!pickSlipFound)
               Column(
@@ -65,8 +73,8 @@ class _ScanVerificationState extends State<ScanVerification> {
                         });
                         return;
                       }
-                      pickSlipData =
-                      (await findPickSlip(context, _pickSlipController.text))!;
+                      pickSlipData = (await findPickSlip(
+                          context, _pickSlipController.text))!;
                       setState(() {
                         isLoading = false;
                       });
@@ -135,15 +143,27 @@ class _ScanVerificationState extends State<ScanVerification> {
                         size: 20.0,
                       ),
                       onSubmitted: (value) {
-
+                        if (_upcController.text.isEmpty) {
+                          return;
+                        }
                         setState(() {
                           _upcController.text = '';
-                          groupedProducts = findScannedUpc(value!, groupedProducts);
+                          currentScannedUpc =
+                              findScannedUpc(value!, groupedProducts);
+                          print('currentScannedUpc: $currentScannedUpc');
                         });
+                        if (currentScannedUpc != 'not found') {
+                          // open the dialog box
+                          openVerificationDialog();
+                        }
                       },
                     ),
                     const SizedBox(height: 16.0),
-                    Text('Pick Slip: ${pickSlipData['pickSlipId']}', style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: Colors.blueGrey)),
+                    Text('Pick Slip: ${pickSlipData['pickSlipId']}',
+                        style: const TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueGrey)),
                     Flexible(
                       child: ListView(
                         children: [
@@ -162,5 +182,85 @@ class _ScanVerificationState extends State<ScanVerification> {
         ),
       ),
     );
+  }
+
+  void openVerificationDialog() {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.8,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16.0),
+                topRight: Radius.circular(16.0),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text('Verify Product',
+                      style: const TextStyle(
+                          fontSize: 18.0, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 16.0),
+                  Input(
+                    hintText: 'Scan Unit ID...',
+                    controller: _unitIdController,
+                    keyboardType: TextInputType.text,
+                    prefixIcon: const Icon(
+                      Icons.barcode_reader,
+                      color: Colors.blueGrey,
+                      size: 20.0,
+                    ),
+                    onSubmitted: (value) {
+                      if (_unitIdController.text.isEmpty) {
+                        return;
+                      }
+                      setState(() {
+                        _unitIdController.text = '';
+                        unitIdMessage = verifyScannedUnitId(
+                            value!, currentScannedUpc, groupedProducts);
+                        print('unitIdMessage: $unitIdMessage');
+                        if(unitIdMessage == 'verified unit id: $value') {
+                          currentScannedUnitId = value;
+                        }
+                      });
+                    },
+                  ),
+                  if(unitIdMessage.isNotEmpty)
+                    Text(unitIdMessage, style: TextStyle(color: unitIdMessage == 'incorrect unit id' ? Colors.red : Colors.green, fontSize: 16.0, fontWeight: FontWeight.bold),),
+                  const SizedBox(height: 16.0),
+                  Input(
+                    hintText: 'Quantity...',
+                    controller: _quantityController,
+                    keyboardType: TextInputType.number,
+                    prefixIcon: const Icon(
+                      Icons.format_list_numbered,
+                      color: Colors.blueGrey,
+                      size: 20.0,
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                ],
+              ),
+            ),
+          );
+        }
+        ).then((_) {
+          setState(() {
+            isDialogOpen = false;
+            currentScannedUnitId = '';
+            currentScannedUpc = '';
+            unitIdMessage = '';
+            _upcController.text = '';
+            _unitIdController.text = '';
+            _quantityController.text = '';
+          });
+    });
   }
 }

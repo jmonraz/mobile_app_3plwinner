@@ -183,15 +183,24 @@ Future<Map<String, String>> findProductByProductIds(BuildContext context, List<d
   return upcsMap;
 }
 
-Map<String, List<Map<String, dynamic>>> findScannedUpc(String scannedUpc, Map<String, List<Map<String, dynamic>>> productList) {
+String findScannedUpc(String scannedUpc, Map<String, List<Map<String, dynamic>>> productList) {
   for (var product in productList.entries) {
     for(var p in product.value) {
       if(p['upc'] == scannedUpc) {
-        p['verified'] = true;
-        print('product verified: $p');
-        break;
+        return p['upc'];
       }
     }
   }
-  return productList;
+  return 'not found';
+}
+
+String verifyScannedUnitId(String scannedUnitId, String upc, Map<String, List<Map<String, dynamic>>> productList) {
+  for (var product in productList.entries) {
+    for(var p in product.value) {
+      if(p['upc'].toString() == upc && p['unitId'].toString() == scannedUnitId) {
+        return 'verified unit id: $scannedUnitId';
+      }
+    }
+  }
+  return 'incorrect unit id';
 }

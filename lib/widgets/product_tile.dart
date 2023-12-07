@@ -28,15 +28,15 @@ class _ProductTileState extends State<ProductTile> {
           children: [
             ListTile(
               title: Text(
-                '${widget.productId}',
-                style: TextStyle(
+                widget.productId,
+                style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18.0,
                     color: Colors.blueGrey),
               ),
               subtitle: Text(
-                '0 of ${widget.productList.length} lines completed',
-                style: TextStyle(
+                '${widget.productList[0]['upc']}\n0 of ${widget.productList.length} lines completed',
+                style: const TextStyle(
                   fontSize: 14.0,
                   fontWeight: FontWeight.bold,
                 ),
