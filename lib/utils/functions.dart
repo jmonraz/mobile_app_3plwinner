@@ -196,7 +196,7 @@ Future<Map<String, String>> findProductByProductIds(BuildContext context, List<d
   return upcsMap;
 }
 
-String findScannedUpc(String scannedUpc, Map<String, List<Map<String, dynamic>>> productList) {
+String findScannedUpc(String scannedUpc, Map<String, dynamic> productList) {
   for (var product in productList.entries) {
     for(var p in product.value) {
       if(p['upc'] == scannedUpc) {
@@ -207,7 +207,7 @@ String findScannedUpc(String scannedUpc, Map<String, List<Map<String, dynamic>>>
   return 'not found';
 }
 
-String verifyScannedUnitId(String scannedUnitId, String upc, Map<String, List<Map<String, dynamic>>> productList) {
+String verifyScannedUnitId(String scannedUnitId, String upc, Map<String, dynamic> productList) {
   if(scannedUnitId.startsWith('N') || scannedUnitId.startsWith('n')) {
     scannedUnitId = scannedUnitId.substring(1);
   }
@@ -222,7 +222,7 @@ String verifyScannedUnitId(String scannedUnitId, String upc, Map<String, List<Ma
   return 'incorrect unit id';
 }
 
-String verifyScannedQuantity(String scannedUnitId, String upc, String quantity, Map<String, List<Map<String, dynamic>>> productList) {
+String verifyScannedQuantity(String scannedUnitId, String upc, String quantity, Map<String, dynamic> productList) {
   print('scannedUnitId: $scannedUnitId');
   print('upc: $upc');
   print('quantity: $quantity');
@@ -236,7 +236,7 @@ String verifyScannedQuantity(String scannedUnitId, String upc, String quantity, 
   return 'incorrect quantity';
 }
 
-Map<String, List<Map<String, dynamic>>> updateVerifiedStatus(String scannedUnitId, String upc, String quantity, Map<String, List<Map<String, dynamic>>> productList) {
+Map<String, dynamic> updateVerifiedStatus(String scannedUnitId, String upc, String quantity, Map<String, dynamic> productList) {
   for (var product in productList.entries) {
     for(var p in product.value) {
       if(p['upc'].toString() == upc && p['unitId'].toString() == scannedUnitId && p['quantity'].toString() == quantity) {
@@ -244,5 +244,20 @@ Map<String, List<Map<String, dynamic>>> updateVerifiedStatus(String scannedUnitI
       }
     }
   }
+  print('productList: $productList');
   return productList;
 }
+
+// String convertToCsv(Map<String, List<Map<String, dynamic>>> groupedProducts ) {
+//   List<List<dynamic>> rows = [];
+//
+//   // adding header row
+//   rows.add(['Pick Slip ID', 'Order ID', 'OrderDate', 'Product ID', 'Zone', 'Aisle', 'Rack', 'Level', 'Quantity', 'Unit ID', 'Upc', 'Verified']);
+//
+//   // extracting the data
+//   groupedProducts.forEach((key, products)) {
+//     for(var product in products) {
+//       rows.add([key])
+//     }
+//   }
+// }

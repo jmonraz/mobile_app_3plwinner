@@ -32,7 +32,7 @@ class _ScanVerificationState extends State<ScanVerification> {
   String currentScannedQuantity = '';
 
   // group products by productId
-  Map<String, List<Map<String, dynamic>>> groupedProducts = {};
+  Map<String, dynamic> groupedProducts = {};
 
   void groupProducts() {
     for (var product in pickSlipData['products']) {
@@ -42,6 +42,7 @@ class _ScanVerificationState extends State<ScanVerification> {
         groupedProducts[product['productId']] = [product];
       }
     }
+    print('groupedProducts: $groupedProducts');
   }
 
   @override
