@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_3plwinner/providers/api_locationreport_taskid_provider.dart';
+import '../providers/api_unshipped_pick_slips_taskid_provider.dart';
+import '../providers/api_warehouse_inventory_detail_taskid_provider.dart';
 import '../services/api_service.dart';
 import '../providers/api_key_provider.dart';
 import '../providers/api_upcreport_taskid_provider.dart';
 import '../providers/api_user_credentials_provider.dart';
 import 'package:provider/provider.dart';
 
-
 Future<Map<String, dynamic>?> handleSignIn(
     BuildContext context, String username, String password,
     {String systemId = "3plwhs"}) async {
-
   final apiService =
       ApiService(baseUrl: 'https://wms.3plwinner.com/veracore/public.api');
   final result = await apiService.signIn(username, password, systemId);
@@ -55,6 +55,16 @@ Future<Map<String, dynamic>?> handleSignIn(
   return result;
 }
 
+Future<String?> handleGetScanVerificationReports(
+    BuildContext context) async {
+  final warehouseInventoryDetailTaskId =
+      await handleGetTaskId(context, 'Warehouse Inventory Detail');
+  final unshippedPickSlipsTaskId =
+      await handleGetTaskId(context, 'unshipped pick slips');
+
+  return 'Reports generated!';
+}
+
 Future<String?> handleGetTaskId(BuildContext context, String reportName) async {
   final apiService =
       ApiService(baseUrl: 'https://wms.3plwinner.com/veracore/public.api');
@@ -89,6 +99,34 @@ Future<String?> handleGetTaskId(BuildContext context, String reportName) async {
         break;
       }
     } while (taskIdStatus['Status'] != 'Done');
+  } else if (reportName == 'Warehouse Inventory Detail') {
+    final apiTaskIdProvider =
+        Provider.of<ApiWarehouseInventoryDetailTaskIdProvider>(context,
+            listen: false);
+    apiTaskIdProvider.setTaskId(response['TaskId']);
+    do {
+      await Future.delayed(const Duration(seconds: 1));
+      taskIdStatus =
+          await apiService.getTaskIdStatus(response['TaskId'], apiKey!);
+      print('API Response from getWarehouseInventoryDetailTaskId: $response');
+      if (taskIdStatus['Status'] == 'Done') {
+        break;
+      }
+    } while (taskIdStatus['Status'] != 'Done');
+  } else if (reportName == 'unshipped pick slips') {
+    final apiTaskIdProvider = Provider.of<ApiUnshippedPickSlipsTaskIdProvider>(
+        context,
+        listen: false);
+    apiTaskIdProvider.setTaskId(response['TaskId']);
+    do {
+      await Future.delayed(const Duration(seconds: 1));
+      taskIdStatus =
+          await apiService.getTaskIdStatus(response['TaskId'], apiKey!);
+      print('API Response from getUnshippedPickSlipsTaskId: $response');
+      if (taskIdStatus['Status'] == 'Done') {
+        break;
+      }
+    } while (taskIdStatus['Status'] != 'Done');
   }
 
   return response['TaskId'];
@@ -106,6 +144,14 @@ Future<Map<String, dynamic>> handleGetReport(
   } else if (reportName == 'Locations') {
     taskId =
         Provider.of<ApiLocationReportTaskIdProvider>(context, listen: false)
+            .taskId;
+  } else if (reportName == 'Warehouse Inventory Detail') {
+    taskId = Provider.of<ApiWarehouseInventoryDetailTaskIdProvider>(context,
+            listen: false)
+        .taskId;
+  } else if (reportName == 'unshipped pick slips') {
+    taskId =
+        Provider.of<ApiUnshippedPickSlipsTaskIdProvider>(context, listen: false)
             .taskId;
   }
 
@@ -131,8 +177,8 @@ Future<Map<String, dynamic>> handlePostReceiving(
         'https://wms.3plwinner.com/PMWarehouse/services/InventoryReceiving.svc/SingleProductInventoryReceiving',
   );
 
-  final result = await apiService.postReceiving(
-      aisle, rack, level, zone, quantity, cusId, productId, username, password, receiptDate);
+  final result = await apiService.postReceiving(aisle, rack, level, zone,
+      quantity, cusId, productId, username, password, receiptDate);
 
   return result;
 }
