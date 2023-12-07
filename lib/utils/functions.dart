@@ -149,28 +149,38 @@ Future<Map<String, dynamic>?> findPickSlip(BuildContext context, String pickSlip
     }
   }
 
+  print('here before upcs');
+
   // add upc property to each product in the mappedPickSlip
-  for(var p in mappedPickSlip['products']) {
-    p['upc'] = await findProductByProductId(context, p['productId']);
+  final productIds = mappedPickSlip['products'].map((e) => e['productId']).toSet().toList();
+
+  // fetch 'upc' values for the product IDs in batches
+  final upcsMap = await findProductByProductIds(context, productIds);
+  print('upcsMap: $upcsMap');
+
+  // add 'upc' property to each product in the mappedPickSlip
+  for (var product in mappedPickSlip['products']) {
+    product['upc'] = upcsMap[product['productId']];
   }
 
   print('mappedPickSlip: $mappedPickSlip');
   return mappedPickSlip;
 }
 
-Future<String> findProductByProductId(BuildContext context, String productId) async {
+Future<Map<String, String>> findProductByProductIds(BuildContext context, List<dynamic> productIds) async {
   final productsResponse = await handleGetReport(context, 'upcs');
 
-  Map<String, dynamic>? foundProduct;
+  final Map<String, String> upcsMap = {};
 
-  for (var p in productsResponse['Data']) {
-    if(p['productId'] == productId) {
-      foundProduct = p;
-      break;
+  for(var p in productsResponse['Data']) {
+    final productId = p['productId'];
+    final upc = p['UPC'];
+
+    if (productIds.contains(productId)) {
+      upcsMap[productId] = upc;
     }
   }
-
-  return foundProduct!['UPC'];
+  return upcsMap;
 }
 
 Map<String, List<Map<String, dynamic>>> findScannedUpc(String scannedUpc, Map<String, List<Map<String, dynamic>>> productList) {
