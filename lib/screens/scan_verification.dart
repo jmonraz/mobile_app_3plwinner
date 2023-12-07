@@ -42,6 +42,8 @@ class _ScanVerificationState extends State<ScanVerification> {
         groupedProducts[product['productId']] = [product];
       }
     }
+    String csv = convertToCsv(groupedProducts, pickSlipData);
+    print('csv: $csv');
     print('groupedProducts: $groupedProducts');
   }
 

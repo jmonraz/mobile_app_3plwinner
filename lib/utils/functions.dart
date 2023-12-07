@@ -79,7 +79,8 @@ String getFormattedUtcDateTime() {
   return formatter.format(currentUtcDate);
 }
 
-Future<Map<String, dynamic>?> findPickSlip(BuildContext context, String pickSlip) async {
+Future<Map<String, dynamic>?> findPickSlip(
+    BuildContext context, String pickSlip) async {
   final pickSlipsResponse =
       await handleGetReport(context, 'unshipped pick slips');
   final warehouseInventoryResponse =
@@ -87,7 +88,6 @@ Future<Map<String, dynamic>?> findPickSlip(BuildContext context, String pickSlip
 
   Map<String, dynamic>? foundPickSlip;
   Map<String, dynamic> mappedPickSlip = {};
-
 
   String? newPickSlip;
   if (pickSlip.startsWith('M') || pickSlip.startsWith('m')) {
@@ -147,9 +147,12 @@ Future<Map<String, dynamic>?> findPickSlip(BuildContext context, String pickSlip
 
   // add unit id property to each product in the mappedPickSlip
   // find the unit id by comparing locations between the warehouse inventory report and the mappedPickSlip object
-  for(var id in warehouseInventoryResponse['Data']) {
-    for(var product in mappedPickSlip['products']) {
-      if(id['Aisle'] == product['aisle'] && id['Rack'] == product['rack'] && id['Level'] == product['level'] && id['Product ID'] == product['productId']) {
+  for (var id in warehouseInventoryResponse['Data']) {
+    for (var product in mappedPickSlip['products']) {
+      if (id['Aisle'] == product['aisle'] &&
+          id['Rack'] == product['rack'] &&
+          id['Level'] == product['level'] &&
+          id['Product ID'] == product['productId']) {
         product['unitId'] = id['Unit ID'];
       }
     }
@@ -158,7 +161,8 @@ Future<Map<String, dynamic>?> findPickSlip(BuildContext context, String pickSlip
   print('here before upcs');
 
   // add upc property to each product in the mappedPickSlip
-  final productIds = mappedPickSlip['products'].map((e) => e['productId']).toSet().toList();
+  final productIds =
+      mappedPickSlip['products'].map((e) => e['productId']).toSet().toList();
   print('productIds: $productIds');
   // fetch 'upc' values for the product IDs in batches
   final upcsMap = await findProductByProductIds(context, productIds);
@@ -173,24 +177,23 @@ Future<Map<String, dynamic>?> findPickSlip(BuildContext context, String pickSlip
   return mappedPickSlip;
 }
 
-Future<Map<String, String>> findProductByProductIds(BuildContext context, List<dynamic> productIds) async {
+Future<Map<String, String>> findProductByProductIds(
+    BuildContext context, List<dynamic> productIds) async {
   final productsResponse = await handleGetReport(context, 'upcs');
 
   final Map<String, String> upcsMap = {};
 
-  for(var p in productsResponse['Data']) {
-
+  for (var p in productsResponse['Data']) {
     final productId = p['productId'];
     final upc = p['UPC'];
 
     if (productIds.contains(productId)) {
-      if(upc == null) {
+      if (upc == null) {
         upcsMap[productId] = 'no upc in system';
         continue;
       } else {
         upcsMap[productId] = upc;
       }
-
     }
   }
   return upcsMap;
@@ -198,8 +201,8 @@ Future<Map<String, String>> findProductByProductIds(BuildContext context, List<d
 
 String findScannedUpc(String scannedUpc, Map<String, dynamic> productList) {
   for (var product in productList.entries) {
-    for(var p in product.value) {
-      if(p['upc'] == scannedUpc) {
+    for (var p in product.value) {
+      if (p['upc'] == scannedUpc) {
         return p['upc'];
       }
     }
@@ -207,14 +210,16 @@ String findScannedUpc(String scannedUpc, Map<String, dynamic> productList) {
   return 'not found';
 }
 
-String verifyScannedUnitId(String scannedUnitId, String upc, Map<String, dynamic> productList) {
-  if(scannedUnitId.startsWith('N') || scannedUnitId.startsWith('n')) {
+String verifyScannedUnitId(
+    String scannedUnitId, String upc, Map<String, dynamic> productList) {
+  if (scannedUnitId.startsWith('N') || scannedUnitId.startsWith('n')) {
     scannedUnitId = scannedUnitId.substring(1);
   }
 
   for (var product in productList.entries) {
-    for(var p in product.value) {
-      if(p['upc'].toString() == upc && p['unitId'].toString() == scannedUnitId) {
+    for (var p in product.value) {
+      if (p['upc'].toString() == upc &&
+          p['unitId'].toString() == scannedUnitId) {
         return 'verified unit id: $scannedUnitId';
       }
     }
@@ -222,13 +227,16 @@ String verifyScannedUnitId(String scannedUnitId, String upc, Map<String, dynamic
   return 'incorrect unit id';
 }
 
-String verifyScannedQuantity(String scannedUnitId, String upc, String quantity, Map<String, dynamic> productList) {
+String verifyScannedQuantity(String scannedUnitId, String upc, String quantity,
+    Map<String, dynamic> productList) {
   print('scannedUnitId: $scannedUnitId');
   print('upc: $upc');
   print('quantity: $quantity');
   for (var product in productList.entries) {
-    for(var p in product.value) {
-      if(p['upc'].toString() == upc && p['unitId'].toString() == scannedUnitId && p['quantity'].toString() == quantity) {
+    for (var p in product.value) {
+      if (p['upc'].toString() == upc &&
+          p['unitId'].toString() == scannedUnitId &&
+          p['quantity'].toString() == quantity) {
         return 'quantity verified';
       }
     }
@@ -236,10 +244,13 @@ String verifyScannedQuantity(String scannedUnitId, String upc, String quantity, 
   return 'incorrect quantity';
 }
 
-Map<String, dynamic> updateVerifiedStatus(String scannedUnitId, String upc, String quantity, Map<String, dynamic> productList) {
+Map<String, dynamic> updateVerifiedStatus(String scannedUnitId, String upc,
+    String quantity, Map<String, dynamic> productList) {
   for (var product in productList.entries) {
-    for(var p in product.value) {
-      if(p['upc'].toString() == upc && p['unitId'].toString() == scannedUnitId && p['quantity'].toString() == quantity) {
+    for (var p in product.value) {
+      if (p['upc'].toString() == upc &&
+          p['unitId'].toString() == scannedUnitId &&
+          p['quantity'].toString() == quantity) {
         p['verified'] = true;
       }
     }
@@ -248,16 +259,37 @@ Map<String, dynamic> updateVerifiedStatus(String scannedUnitId, String upc, Stri
   return productList;
 }
 
-// String convertToCsv(Map<String, List<Map<String, dynamic>>> groupedProducts ) {
-//   List<List<dynamic>> rows = [];
-//
-//   // adding header row
-//   rows.add(['Pick Slip ID', 'Order ID', 'OrderDate', 'Product ID', 'Zone', 'Aisle', 'Rack', 'Level', 'Quantity', 'Unit ID', 'Upc', 'Verified']);
-//
-//   // extracting the data
-//   groupedProducts.forEach((key, products)) {
-//     for(var product in products) {
-//       rows.add([key])
-//     }
-//   }
-// }
+String convertToCsv(Map<String, dynamic> groupedProducts,
+    Map<String, dynamic> pickSlipDetails) {
+  List<List<dynamic>> rows = [];
+
+  // adding header row
+  rows.add(['Pick Slip ID', 'Order ID', 'OrderDate']);
+
+  // adding pick slip details
+  rows.add([
+    pickSlipDetails['pickSlipId'],
+    pickSlipDetails['orderId'],
+    pickSlipDetails['orderDate']
+  ]);
+
+  // adding header row
+  rows.add(['Product ID', 'UPC', 'Unit ID', 'Quantity', 'Verified']);
+
+  // extracting the data
+  for (var product in groupedProducts.entries) {
+    for (var p in product.value) {
+      rows.add([
+        p['productId'],
+        p['upc'],
+        p['unitId'],
+        p['quantity'],
+        p['verified']
+      ]);
+    }
+  }
+
+  String csv = rows.map((row) => row.join(',')).join('\n');
+  print(csv);
+  return csv;
+}
