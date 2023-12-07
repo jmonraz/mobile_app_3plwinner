@@ -23,11 +23,13 @@ class _ScanVerificationState extends State<ScanVerification> {
 
   Map<String, dynamic> pickSlipData = {};
   String errorMessage = '';
+  String unitIdMessage = '';
+  String quantityMessage = '';
 
   // current upc being scanned
   String currentScannedUpc = '';
   String currentScannedUnitId = '';
-  String unitIdMessage = '';
+  String currentScannedQuantity = '';
 
   // group products by productId
   Map<String, List<Map<String, dynamic>>> groupedProducts = {};
@@ -223,6 +225,7 @@ class _ScanVerificationState extends State<ScanVerification> {
                       }
                       setState(() {
                         _unitIdController.text = '';
+                        quantityMessage = '';
                         unitIdMessage = verifyScannedUnitId(
                             value!, currentScannedUpc, groupedProducts);
                         print('unitIdMessage: $unitIdMessage');
@@ -244,7 +247,31 @@ class _ScanVerificationState extends State<ScanVerification> {
                       color: Colors.blueGrey,
                       size: 20.0,
                     ),
+                    onSubmitted: (value) {
+                      if (_quantityController.text.isEmpty) {
+                        return;
+                      }
+                      if(unitIdMessage == 'verified unit id: $currentScannedUnitId') {
+                        currentScannedQuantity = value.toString();
+                        setState(() {
+                          quantityMessage = verifyScannedQuantity(currentScannedUnitId, currentScannedUpc, currentScannedQuantity, groupedProducts);
+                        });
+                      } else if (unitIdMessage.isEmpty) {
+                        setState(() {
+                          quantityMessage = 'Please scan a unit ID first!';
+                        });
+                      } else {
+                        setState(() {
+                          quantityMessage = 'Incorrect unit ID!';
+                        });
+                      }
+                      setState(() {
+                        _quantityController.text = '';
+                      });
+                    },
                   ),
+                  if(quantityMessage.isNotEmpty)
+                    Text(quantityMessage, style: TextStyle(color: quantityMessage != "quantity verified" ? Colors.red : Colors.green, fontSize: 16.0, fontWeight: FontWeight.bold),),
                   const SizedBox(height: 16.0),
                 ],
               ),
@@ -257,6 +284,7 @@ class _ScanVerificationState extends State<ScanVerification> {
             currentScannedUnitId = '';
             currentScannedUpc = '';
             unitIdMessage = '';
+            quantityMessage = '';
             _upcController.text = '';
             _unitIdController.text = '';
             _quantityController.text = '';

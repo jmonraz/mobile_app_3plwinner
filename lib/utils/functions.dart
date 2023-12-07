@@ -204,3 +204,17 @@ String verifyScannedUnitId(String scannedUnitId, String upc, Map<String, List<Ma
   }
   return 'incorrect unit id';
 }
+
+String verifyScannedQuantity(String scannedUnitId, String upc, String quantity, Map<String, List<Map<String, dynamic>>> productList) {
+  print('scannedUnitId: $scannedUnitId');
+  print('upc: $upc');
+  print('quantity: $quantity');
+  for (var product in productList.entries) {
+    for(var p in product.value) {
+      if(p['upc'].toString() == upc && p['unitId'].toString() == scannedUnitId && p['quantity'].toString() == quantity) {
+        return 'quantity verified';
+      }
+    }
+  }
+  return 'incorrect quantity';
+}
