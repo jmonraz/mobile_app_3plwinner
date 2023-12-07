@@ -134,7 +134,8 @@ Future<Map<String, dynamic>?> findPickSlip(BuildContext context, String pickSlip
       'aisle': aisle,
       'rack': rack,
       'level': level,
-      'quantity': quantity
+      'quantity': quantity,
+      'verified': false,
     });
   }
 
@@ -170,4 +171,17 @@ Future<String> findProductByProductId(BuildContext context, String productId) as
   }
 
   return foundProduct!['UPC'];
+}
+
+Map<String, List<Map<String, dynamic>>> findScannedUpc(String scannedUpc, Map<String, List<Map<String, dynamic>>> productList) {
+  for (var product in productList.entries) {
+    for(var p in product.value) {
+      if(p['upc'] == scannedUpc) {
+        p['verified'] = true;
+        print('product verified: $p');
+        break;
+      }
+    }
+  }
+  return productList;
 }

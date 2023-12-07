@@ -135,9 +135,10 @@ class _ScanVerificationState extends State<ScanVerification> {
                         size: 20.0,
                       ),
                       onSubmitted: (value) {
-                        print('upc: $value');
+
                         setState(() {
                           _upcController.text = '';
+                          groupedProducts = findScannedUpc(value!, groupedProducts);
                         });
                       },
                     ),

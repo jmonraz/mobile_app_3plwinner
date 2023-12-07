@@ -57,6 +57,7 @@ class _ProductTileState extends State<ProductTile> {
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     border: Border.all(color: Colors.blueGrey),
+                                    color: widget.productList[index]['verified'] ? Colors.green : Colors.white,
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(8.0)),
                                   ),
@@ -68,7 +69,7 @@ class _ProductTileState extends State<ProductTile> {
                                       children: [
                                         Text('Unit ID: ${widget.productList[index]['unitId']}'),
                                         Text('Total quantity: ${widget.productList[index]['quantity']}'),
-                                        Text('Verified? No'),
+                                        Text('Verified: ${widget.productList[index]['verified']}'),
                                       ],
                                     ),
                                   ))
