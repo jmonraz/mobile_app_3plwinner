@@ -213,7 +213,7 @@ class _ScanVerificationState extends State<ScanVerification> {
                               String csv = convertToCsv(
                                   context, groupedProducts, pickSlipData);
                               String response =
-                                  await sendCsvAsEmail(csv, 'scan_verification_${pickSlipData['pickSlipId']}');
+                                  await sendCsvAsEmail(csv, 'scan_verification_pick_slip_${pickSlipData['pickSlipId']}');
                               setState(() {
                                 scanVerificationMessage = response;
                                 isEmailSent = false;
