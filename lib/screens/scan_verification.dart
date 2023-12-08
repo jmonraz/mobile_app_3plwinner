@@ -213,7 +213,7 @@ class _ScanVerificationState extends State<ScanVerification> {
                               String csv = convertToCsv(
                                   context, groupedProducts, pickSlipData);
                               String response =
-                                  await sendCsvAsEmail(csv, 'test.csv');
+                                  await sendCsvAsEmail(csv, 'scan_verification_${pickSlipData['pickSlipId']}');
                               setState(() {
                                 scanVerificationMessage = response;
                                 isEmailSent = false;
@@ -315,7 +315,7 @@ class _ScanVerificationState extends State<ScanVerification> {
                   Input(
                     hintText: 'Scan Unit ID...',
                     controller: _unitIdController,
-                    keyboardType: TextInputType.text,
+                    keyboardType: TextInputType.number,
                     prefixIcon: const Icon(
                       Icons.barcode_reader,
                       color: Colors.blueGrey,

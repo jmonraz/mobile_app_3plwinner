@@ -219,8 +219,9 @@ String verifyScannedUnitId(String scannedUnitId, String upc, String quantity,
 
       if (p['upc'].toString() == upc &&
           p['quantity'].toString() == quantity && p['verified'] == false) {
+        p['previousUnitId'] = p['unitId'];
         p['unitId'] = scannedUnitId;
-        print('p: $p');
+
         return 'unit id verified, continue with next line';
       }
     }
@@ -272,7 +273,7 @@ String convertToCsv(BuildContext context, Map<String, dynamic> groupedProducts,
   ]);
 
   // adding header row
-  rows.add(['Product ID', 'UPC', 'Unit ID', 'Quantity', 'Verified']);
+  rows.add(['Product ID', 'UPC', 'Original Unit ID', 'Scanned Unit ID', 'Quantity', 'Verified']);
 
   // extracting the data
   for (var product in groupedProducts.entries) {
@@ -280,6 +281,7 @@ String convertToCsv(BuildContext context, Map<String, dynamic> groupedProducts,
       rows.add([
         p['productId'],
         p['upc'],
+        p['previousUnitId'],
         p['unitId'],
         p['quantity'],
         p['verified']
@@ -315,10 +317,10 @@ Future<String> sendCsvAsEmail(String csvData, String filename) async {
 
   // Create the email message
   final message = Message()
-    ..from = Address(username, 'test')
+    ..from = Address(username, 'Scan Verification App')
     ..recipients.addAll(['wms@3plwinner.com', 'angelk@3plwinner.com'])
     ..subject = 'Pick Slip Verification: ${DateTime.now()}'
-    ..text = 'Please find the attached csv file.'
+    ..text = 'Please find the attached csv file containing scan verification details.'
     ..attachments = [FileAttachment(file)]; // Attach the CSV file
 
   try {
