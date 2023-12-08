@@ -222,7 +222,7 @@ class _ScanVerificationState extends State<ScanVerification> {
                             child: !isEmailSent
                                 ? const Text(
                                     'Finish Verification',
-                                    style: TextStyle(color: Colors.white),
+                                    style: TextStyle(color: Colors.white, fontSize: 16.0, fontWeight: FontWeight.bold),
                                   )
                                 : const CircularProgressIndicator(),
                           ),
@@ -253,7 +253,7 @@ class _ScanVerificationState extends State<ScanVerification> {
         context: context,
         builder: (BuildContext context) {
           return Container(
-            height: MediaQuery.of(context).size.height * 0.8,
+            height: MediaQuery.of(context).size.height * 0.85,
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.only(
@@ -349,6 +349,7 @@ class _ScanVerificationState extends State<ScanVerification> {
                               'unit id verified, continue with next line') {
                             _quantityController.text = '';
                             _unitIdController.text = '';
+                            quantityMessage = '';
                             groupedProducts = updateVerifiedStatus(
                                 currentScannedUnitId,
                                 currentScannedUpc,
@@ -364,7 +365,8 @@ class _ScanVerificationState extends State<ScanVerification> {
                     Text(
                       unitIdMessage,
                       style: TextStyle(
-                          color: quantityMessage != 'quantity verified'
+                          color: unitIdMessage !=
+                                      'unit id verified, continue with next line'
                               ? Colors.red
                               : Colors.green,
                           fontSize: 16.0,
@@ -373,14 +375,14 @@ class _ScanVerificationState extends State<ScanVerification> {
                   const SizedBox(height: 16.0),
                   isCompleted
                       ? const Center(
-                        child: Text(
+                          child: Text(
                             'All lines verified',
                             style: TextStyle(
                                 color: Colors.green,
                                 fontSize: 22.0,
                                 fontWeight: FontWeight.bold),
                           ),
-                      )
+                        )
                       : const SizedBox(),
                 ],
               ),
