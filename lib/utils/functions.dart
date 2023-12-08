@@ -298,7 +298,8 @@ String convertToCsv(Map<String, dynamic> groupedProducts,
   return csv;
 }
 
-Future<void> sendCsvAsEmail(String csvData, String filename) async {
+Future<String> sendCsvAsEmail(String csvData, String filename) async {
+  String alertMessage = '';
   final directory = await getTemporaryDirectory();
   final path = directory.path;
 
@@ -328,15 +329,15 @@ Future<void> sendCsvAsEmail(String csvData, String filename) async {
 
   try {
     final sendReport = await send(message, smtpServer);
-    print('Message sent: ' + sendReport.toString());
+    alertMessage = 'Email sent successfully';
   } on MailerException catch (e) {
-    print(e.message);
-    print('Message not sent.');
+    alertMessage = 'Email not sent. \n${e.message}';
     for (var p in e.problems) {
-      print('Problem: ${p.code}: ${p.msg}');
+      alertMessage += '\nProblem: ${p.code}: ${p.msg}';
     }
   }
 
   // Optionally, delete the temporary file
   await file.delete();
+  return alertMessage;
 }

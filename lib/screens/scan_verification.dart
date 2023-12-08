@@ -20,11 +20,13 @@ class _ScanVerificationState extends State<ScanVerification> {
   bool pickSlipFound = false;
   bool isLoading = false;
   bool isDialogOpen = false;
+  bool isEmailSent = false;
 
   Map<String, dynamic> pickSlipData = {};
   String errorMessage = '';
   String unitIdMessage = '';
   String quantityMessage = '';
+  String scanVerificationMessage = '';
 
   // current upc being scanned
   String currentScannedUpc = '';
@@ -177,12 +179,41 @@ class _ScanVerificationState extends State<ScanVerification> {
                           Button(
                             text: 'text',
                             onPressed: () async {
-                              String csv = convertToCsv(
-                                  groupedProducts, pickSlipData);
-                              await sendCsvAsEmail(csv, 'test.csv');
+                              setState(() {
+                                isEmailSent = true;
+                              });
+                              if (groupedProducts.values.any((element) =>
+                                  element.any((element) =>
+                                      element['verified'] == false))) {
+                                setState(() {
+                                  scanVerificationMessage =
+                                      'Please verify all products!';
+                                  isEmailSent = false;
+                                });
+                                return;
+                              }
+                              String csv =
+                                  convertToCsv(groupedProducts, pickSlipData);
+                              String response =
+                                  await sendCsvAsEmail(csv, 'test.csv');
+                              setState(() {
+                                scanVerificationMessage = response;
+                                isEmailSent = false;
+                              });
                             },
-                            child: Text('Finish Verification'),
+                            child: !isEmailSent
+                                ? const Text('Finish Verification')
+                                : const CircularProgressIndicator(),
                           ),
+                          if (scanVerificationMessage.isNotEmpty)
+                            Text(
+                              scanVerificationMessage,
+                              style: TextStyle(
+                                  color: scanVerificationMessage !=
+                                          'Email sent successfully'
+                                      ? Colors.red
+                                      : Colors.green),
+                            ),
                         ],
                       ),
                     ),
