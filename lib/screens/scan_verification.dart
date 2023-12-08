@@ -21,6 +21,7 @@ class _ScanVerificationState extends State<ScanVerification> {
   bool isLoading = false;
   bool isDialogOpen = false;
   bool isEmailSent = false;
+  bool isCompleted = false;
 
   Map<String, dynamic> pickSlipData = {};
   String errorMessage = '';
@@ -42,6 +43,23 @@ class _ScanVerificationState extends State<ScanVerification> {
         groupedProducts[product['productId']]!.add(product);
       } else {
         groupedProducts[product['productId']] = [product];
+      }
+    }
+  }
+
+  void isProductCompleted(String upc) {
+    isCompleted = false;
+    for (var product in groupedProducts.entries) {
+      for (var p in product.value) {
+        if (p['upc'] == upc) {
+          if (product.value.every((element) => element['verified'] == true)) {
+            setState(() {
+              isCompleted = true;
+              quantityMessage = '';
+              unitIdMessage = '';
+            });
+          }
+        }
       }
     }
   }
@@ -158,6 +176,7 @@ class _ScanVerificationState extends State<ScanVerification> {
                         if (currentScannedUpc != 'not found') {
                           // open the dialog box
                           openVerificationDialog();
+                          isProductCompleted(currentScannedUpc);
                         }
                       },
                     ),
@@ -191,8 +210,8 @@ class _ScanVerificationState extends State<ScanVerification> {
                                 });
                                 return;
                               }
-                              String csv =
-                                  convertToCsv(context, groupedProducts, pickSlipData);
+                              String csv = convertToCsv(
+                                  context, groupedProducts, pickSlipData);
                               String response =
                                   await sendCsvAsEmail(csv, 'test.csv');
                               setState(() {
@@ -273,7 +292,11 @@ class _ScanVerificationState extends State<ScanVerification> {
                             groupedProducts);
                         if (quantityMessage == 'quantity verified') {
                           currentScannedQuantity = value!;
+                          _unitIdController.text = '';
+                          unitIdMessage = '';
+                        } else {
                           _quantityController.text = '';
+                          unitIdMessage = '';
                         }
                       });
                     },
@@ -305,11 +328,13 @@ class _ScanVerificationState extends State<ScanVerification> {
                       if (currentScannedQuantity.isEmpty) {
                         setState(() {
                           unitIdMessage = 'Please scan quantity first';
+                          _unitIdController.text = '';
                         });
                         return;
                       } else if (quantityMessage != 'quantity verified') {
                         setState(() {
                           unitIdMessage = 'Please verify quantity first';
+                          _unitIdController.text = '';
                         });
                         return;
                       } else {
@@ -320,16 +345,16 @@ class _ScanVerificationState extends State<ScanVerification> {
                               currentScannedUpc,
                               currentScannedQuantity,
                               groupedProducts);
-                          if (unitIdMessage == 'unit id verified') {
-                            print('ok');
+                          if (unitIdMessage ==
+                              'unit id verified, continue with next line') {
+                            _quantityController.text = '';
                             _unitIdController.text = '';
-
                             groupedProducts = updateVerifiedStatus(
-                              currentScannedUnitId,
+                                currentScannedUnitId,
                                 currentScannedUpc,
                                 currentScannedQuantity,
                                 groupedProducts);
-
+                            isProductCompleted(currentScannedUpc);
                           }
                         });
                       }
@@ -345,6 +370,18 @@ class _ScanVerificationState extends State<ScanVerification> {
                           fontSize: 16.0,
                           fontWeight: FontWeight.bold),
                     ),
+                  const SizedBox(height: 16.0),
+                  isCompleted
+                      ? const Center(
+                        child: Text(
+                            'All lines verified',
+                            style: TextStyle(
+                                color: Colors.green,
+                                fontSize: 22.0,
+                                fontWeight: FontWeight.bold),
+                          ),
+                      )
+                      : const SizedBox(),
                 ],
               ),
             ),

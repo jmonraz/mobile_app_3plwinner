@@ -221,7 +221,7 @@ String verifyScannedUnitId(String scannedUnitId, String upc, String quantity,
           p['quantity'].toString() == quantity && p['verified'] == false) {
         p['unitId'] = scannedUnitId;
         print('p: $p');
-        return 'unit id verified';
+        return 'unit id verified, continue with next line';
       }
     }
   }
