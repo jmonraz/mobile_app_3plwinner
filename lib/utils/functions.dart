@@ -36,7 +36,6 @@ Future<String> findProduct(BuildContext context, String upc, String zone,
   }
 
   if (foundProduct != null && foundLocation != null) {
-    print('into receiving mode');
     String currentTime = getFormattedUtcDateTime();
     final username =
         Provider.of<ApiUserCredentialsProvider>(context, listen: false)
@@ -105,7 +104,6 @@ Future<Map<String, dynamic>?> findPickSlip(
   for (var ps in pickSlipsResponse['Data']) {
     if (ps['Pick Slip ID'].toString() == newPickSlip) {
       foundPickSlip = ps;
-      print('found pick slip: $ps');
       break;
     }
   }
@@ -163,22 +161,16 @@ Future<Map<String, dynamic>?> findPickSlip(
     }
   }
 
-  print('here before upcs');
-
   // add upc property to each product in the mappedPickSlip
   final productIds =
       mappedPickSlip['products'].map((e) => e['productId']).toSet().toList();
-  print('productIds: $productIds');
   // fetch 'upc' values for the product IDs in batches
   final upcsMap = await findProductByProductIds(context, productIds);
-  print('upcsMap: $upcsMap');
-
   // add 'upc' property to each product in the mappedPickSlip
   for (var product in mappedPickSlip['products']) {
     product['upc'] = upcsMap[product['productId']];
   }
 
-  print('mappedPickSlip: $mappedPickSlip');
   return mappedPickSlip;
 }
 
@@ -194,7 +186,7 @@ Future<Map<String, String>> findProductByProductIds(
 
     if (productIds.contains(productId)) {
       if (upc == null) {
-        upcsMap[productId] = 'no upc in system';
+        upcsMap[productId] = 'upc missing';
         continue;
       } else {
         upcsMap[productId] = upc;
@@ -215,33 +207,32 @@ String findScannedUpc(String scannedUpc, Map<String, dynamic> productList) {
   return 'not found';
 }
 
-String verifyScannedUnitId(
-    String scannedUnitId, String upc, Map<String, dynamic> productList) {
+String verifyScannedUnitId(String scannedUnitId, String upc, String quantity,
+    Map<String, dynamic> productList) {
   if (scannedUnitId.startsWith('N') || scannedUnitId.startsWith('n')) {
     scannedUnitId = scannedUnitId.substring(1);
   }
 
   for (var product in productList.entries) {
     for (var p in product.value) {
+      print('p: $p');
+
       if (p['upc'].toString() == upc &&
-          p['unitId'].toString() == scannedUnitId) {
-        return 'verified unit id: $scannedUnitId';
+          p['quantity'].toString() == quantity && p['verified'] == false) {
+        p['unitId'] = scannedUnitId;
+        print('p: $p');
+        return 'unit id verified';
       }
     }
   }
   return 'incorrect unit id';
 }
 
-String verifyScannedQuantity(String scannedUnitId, String upc, String quantity,
-    Map<String, dynamic> productList) {
-  print('scannedUnitId: $scannedUnitId');
-  print('upc: $upc');
-  print('quantity: $quantity');
+String verifyScannedQuantity(
+    String upc, String quantity, Map<String, dynamic> productList) {
   for (var product in productList.entries) {
     for (var p in product.value) {
-      if (p['upc'].toString() == upc &&
-          p['unitId'].toString() == scannedUnitId &&
-          p['quantity'].toString() == quantity) {
+      if (p['upc'].toString() == upc && p['quantity'].toString() == quantity) {
         return 'quantity verified';
       }
     }
@@ -260,7 +251,6 @@ Map<String, dynamic> updateVerifiedStatus(String scannedUnitId, String upc,
       }
     }
   }
-  print('productList: $productList');
   return productList;
 }
 
@@ -307,10 +297,11 @@ Future<String> sendCsvAsEmail(String csvData, String filename) async {
   await file.writeAsString(csvData);
 
   String username = '3plwinnerwms@gmail.com'; // Your email
-  String password = 'cjptjqoojmkrpdql';   // Your email password
+  String password = 'cjptjqoojmkrpdql'; // Your email password
 
   // Configure your SMTP server settings
-  final smtpServer = SmtpServer('smtp.gmail.com', // Replace with actual host
+  final smtpServer = SmtpServer(
+    'smtp.gmail.com', // Replace with actual host
     port: 587,
     username: username,
     password: password,
@@ -322,7 +313,7 @@ Future<String> sendCsvAsEmail(String csvData, String filename) async {
   // Create the email message
   final message = Message()
     ..from = Address(username, 'test')
-    ..recipients.addAll(['wms@3plwinner.com'])
+    ..recipients.addAll(['wms@3plwinner.com', 'angelk@3plwinner.com'])
     ..subject = 'Pick Slip Verification: ${DateTime.now()}'
     ..text = 'Please find the attached csv file.'
     ..attachments = [FileAttachment(file)]; // Attach the CSV file

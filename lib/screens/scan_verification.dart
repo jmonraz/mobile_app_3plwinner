@@ -202,7 +202,10 @@ class _ScanVerificationState extends State<ScanVerification> {
                               });
                             },
                             child: !isEmailSent
-                                ? const Text('Finish Verification')
+                                ? const Text(
+                                    'Finish Verification',
+                                    style: TextStyle(color: Colors.white),
+                                  )
                                 : const CircularProgressIndicator(),
                           ),
                           if (scanVerificationMessage.isNotEmpty)
@@ -246,45 +249,9 @@ class _ScanVerificationState extends State<ScanVerification> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('Verify Product',
-                      style: const TextStyle(
-                          fontSize: 18.0, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 16.0),
-                  Input(
-                    hintText: 'Scan Unit ID...',
-                    controller: _unitIdController,
-                    keyboardType: TextInputType.text,
-                    prefixIcon: const Icon(
-                      Icons.barcode_reader,
-                      color: Colors.blueGrey,
-                      size: 20.0,
-                    ),
-                    onSubmitted: (value) {
-                      if (_unitIdController.text.isEmpty) {
-                        return;
-                      }
-                      setState(() {
-                        _unitIdController.text = '';
-                        quantityMessage = '';
-                        unitIdMessage = verifyScannedUnitId(
-                            value!, currentScannedUpc, groupedProducts);
-                        print('unitIdMessage: $unitIdMessage');
-                        if (unitIdMessage == 'verified unit id: $value') {
-                          currentScannedUnitId = value;
-                        }
-                      });
-                    },
-                  ),
-                  if (unitIdMessage.isNotEmpty)
-                    Text(
-                      unitIdMessage,
+                  const Text('Verify Product',
                       style: TextStyle(
-                          color: unitIdMessage == 'incorrect unit id'
-                              ? Colors.red
-                              : Colors.green,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold),
-                    ),
+                          fontSize: 18.0, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 16.0),
                   Input(
                     hintText: 'Quantity...',
@@ -299,34 +266,16 @@ class _ScanVerificationState extends State<ScanVerification> {
                       if (_quantityController.text.isEmpty) {
                         return;
                       }
-                      if (unitIdMessage ==
-                          'verified unit id: $currentScannedUnitId') {
-                        currentScannedQuantity = value.toString();
-                        setState(() {
-                          quantityMessage = verifyScannedQuantity(
-                              currentScannedUnitId,
-                              currentScannedUpc,
-                              currentScannedQuantity,
-                              groupedProducts);
-                          if (quantityMessage == 'quantity verified') {
-                            groupedProducts = updateVerifiedStatus(
-                                currentScannedUnitId,
-                                currentScannedUpc,
-                                currentScannedQuantity,
-                                groupedProducts);
-                          }
-                        });
-                      } else if (unitIdMessage.isEmpty) {
-                        setState(() {
-                          quantityMessage = 'Please scan a unit ID first!';
-                        });
-                      } else {
-                        setState(() {
-                          quantityMessage = 'Incorrect unit ID!';
-                        });
-                      }
+                      currentScannedQuantity = value.toString();
                       setState(() {
-                        _quantityController.text = '';
+                        quantityMessage = verifyScannedQuantity(
+                            currentScannedUpc,
+                            currentScannedQuantity,
+                            groupedProducts);
+                        if (quantityMessage == 'quantity verified') {
+                          currentScannedQuantity = value!;
+                          _quantityController.text = '';
+                        }
                       });
                     },
                   ),
@@ -341,6 +290,62 @@ class _ScanVerificationState extends State<ScanVerification> {
                           fontWeight: FontWeight.bold),
                     ),
                   const SizedBox(height: 16.0),
+                  Input(
+                    hintText: 'Scan Unit ID...',
+                    controller: _unitIdController,
+                    keyboardType: TextInputType.text,
+                    prefixIcon: const Icon(
+                      Icons.barcode_reader,
+                      color: Colors.blueGrey,
+                      size: 20.0,
+                    ),
+                    onSubmitted: (value) {
+                      if (_unitIdController.text.isEmpty) {
+                        return;
+                      }
+                      if (currentScannedQuantity.isEmpty) {
+                        setState(() {
+                          unitIdMessage = 'Please scan quantity first';
+                        });
+                        return;
+                      } else if (quantityMessage != 'quantity verified') {
+                        setState(() {
+                          unitIdMessage = 'Please verify quantity first';
+                        });
+                        return;
+                      } else {
+                        setState(() {
+                          currentScannedUnitId = value.toString();
+                          unitIdMessage = verifyScannedUnitId(
+                              currentScannedUnitId,
+                              currentScannedUpc,
+                              currentScannedQuantity,
+                              groupedProducts);
+                          if (unitIdMessage == 'unit id verified') {
+                            print('ok');
+                            _unitIdController.text = '';
+
+                            groupedProducts = updateVerifiedStatus(
+                              currentScannedUnitId,
+                                currentScannedUpc,
+                                currentScannedQuantity,
+                                groupedProducts);
+
+                          }
+                        });
+                      }
+                    },
+                  ),
+                  if (unitIdMessage.isNotEmpty)
+                    Text(
+                      unitIdMessage,
+                      style: TextStyle(
+                          color: quantityMessage != 'quantity verified'
+                              ? Colors.red
+                              : Colors.green,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold),
+                    ),
                 ],
               ),
             ),
