@@ -44,7 +44,6 @@ class _ScanVerificationState extends State<ScanVerification> {
         groupedProducts[product['productId']] = [product];
       }
     }
-    String csv = convertToCsv(groupedProducts, pickSlipData);
   }
 
   @override
@@ -193,7 +192,7 @@ class _ScanVerificationState extends State<ScanVerification> {
                                 return;
                               }
                               String csv =
-                                  convertToCsv(groupedProducts, pickSlipData);
+                                  convertToCsv(context, groupedProducts, pickSlipData);
                               String response =
                                   await sendCsvAsEmail(csv, 'test.csv');
                               setState(() {

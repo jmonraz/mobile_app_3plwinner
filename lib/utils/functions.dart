@@ -254,18 +254,21 @@ Map<String, dynamic> updateVerifiedStatus(String scannedUnitId, String upc,
   return productList;
 }
 
-String convertToCsv(Map<String, dynamic> groupedProducts,
+String convertToCsv(BuildContext context, Map<String, dynamic> groupedProducts,
     Map<String, dynamic> pickSlipDetails) {
   List<List<dynamic>> rows = [];
 
   // adding header row
-  rows.add(['Pick Slip ID', 'Order ID', 'OrderDate']);
+  rows.add(['Pick Slip ID', 'Order ID', 'OrderDate', 'TransactionDate', 'Username']);
 
+  final formattedDateTime = DateFormat('MM/dd/yyyy hh:mm:ss').format(DateTime.now());
   // adding pick slip details
   rows.add([
     pickSlipDetails['pickSlipId'],
     pickSlipDetails['orderId'],
-    pickSlipDetails['orderDate']
+    pickSlipDetails['orderDate'],
+    formattedDateTime,
+    Provider.of<ApiUserCredentialsProvider>(context, listen: false).username
   ]);
 
   // adding header row
