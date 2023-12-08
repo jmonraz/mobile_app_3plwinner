@@ -43,8 +43,6 @@ class _ScanVerificationState extends State<ScanVerification> {
       }
     }
     String csv = convertToCsv(groupedProducts, pickSlipData);
-    print('csv: $csv');
-    print('groupedProducts: $groupedProducts');
   }
 
   @override
@@ -175,7 +173,16 @@ class _ScanVerificationState extends State<ScanVerification> {
                             ProductTile(
                               productId: product.key,
                               productList: product.value,
-                            )
+                            ),
+                          Button(
+                            text: 'text',
+                            onPressed: () async {
+                              String csv = convertToCsv(
+                                  groupedProducts, pickSlipData);
+                              await sendCsvAsEmail(csv, 'test.csv');
+                            },
+                            child: Text('Finish Verification'),
+                          ),
                         ],
                       ),
                     ),

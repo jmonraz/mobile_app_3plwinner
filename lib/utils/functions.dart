@@ -3,6 +3,11 @@ import 'api_utils.dart';
 import 'package:intl/intl.dart';
 import '../providers/api_user_credentials_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 
 Future<String> findProduct(BuildContext context, String upc, String zone,
     String locationId, int quantity) async {
@@ -290,6 +295,48 @@ String convertToCsv(Map<String, dynamic> groupedProducts,
   }
 
   String csv = rows.map((row) => row.join(',')).join('\n');
-  print(csv);
   return csv;
+}
+
+Future<void> sendCsvAsEmail(String csvData, String filename) async {
+  final directory = await getTemporaryDirectory();
+  final path = directory.path;
+
+  final file = File('$path/$filename.csv');
+  await file.writeAsString(csvData);
+
+  String username = '3plwinnerwms@gmail.com'; // Your email
+  String password = 'cjptjqoojmkrpdql';   // Your email password
+
+  // Configure your SMTP server settings
+  final smtpServer = SmtpServer('smtp.gmail.com', // Replace with actual host
+    port: 587,
+    username: username,
+    password: password,
+    ignoreBadCertificate: true, // for self-signed certificates
+    ssl: false,
+    allowInsecure: true, // For testing purposes
+  );
+
+  // Create the email message
+  final message = Message()
+    ..from = Address(username, 'test')
+    ..recipients.addAll(['wms@3plwinner.com'])
+    ..subject = 'Pick Slip Verification: ${DateTime.now()}'
+    ..text = 'Please find the attached csv file.'
+    ..attachments = [FileAttachment(file)]; // Attach the CSV file
+
+  try {
+    final sendReport = await send(message, smtpServer);
+    print('Message sent: ' + sendReport.toString());
+  } on MailerException catch (e) {
+    print(e.message);
+    print('Message not sent.');
+    for (var p in e.problems) {
+      print('Problem: ${p.code}: ${p.msg}');
+    }
+  }
+
+  // Optionally, delete the temporary file
+  await file.delete();
 }
