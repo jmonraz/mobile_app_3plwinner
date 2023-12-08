@@ -28,6 +28,7 @@ class _ScanVerificationState extends State<ScanVerification> {
   String unitIdMessage = '';
   String quantityMessage = '';
   String scanVerificationMessage = '';
+  String upcMessage = '';
 
   // current upc being scanned
   String currentScannedUpc = '';
@@ -137,6 +138,10 @@ class _ScanVerificationState extends State<ScanVerification> {
                                 pickSlipFound = true;
                                 errorMessage = '';
                               });
+                            } else {
+                              setState(() {
+                                errorMessage = 'Pick slip not found';
+                              });
                             }
                           },
                           child: const Text('Verify Pick Slip',
@@ -146,7 +151,10 @@ class _ScanVerificationState extends State<ScanVerification> {
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Text(
                         errorMessage,
-                        style: const TextStyle(color: Colors.red),
+                        style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                 ],
@@ -172,14 +180,28 @@ class _ScanVerificationState extends State<ScanVerification> {
                           _upcController.text = '';
                           currentScannedUpc =
                               findScannedUpc(value!, groupedProducts);
+                          if (currentScannedUpc == 'not found') {
+                            upcMessage = 'Product not found on pick slip';
+                          }
                         });
                         if (currentScannedUpc != 'not found') {
                           // open the dialog box
+                          setState(() {
+                            upcMessage = '';
+                          });
                           openVerificationDialog();
                           isProductCompleted(currentScannedUpc);
                         }
                       },
                     ),
+                    if (upcMessage.isNotEmpty)
+                      Text(
+                        upcMessage,
+                        style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold),
+                      ),
                     const SizedBox(height: 16.0),
                     Text('Pick Slip: ${pickSlipData['pickSlipId']}',
                         style: const TextStyle(
@@ -212,8 +234,8 @@ class _ScanVerificationState extends State<ScanVerification> {
                               }
                               String csv = convertToCsv(
                                   context, groupedProducts, pickSlipData);
-                              String response =
-                                  await sendCsvAsEmail(csv, 'scan_verification_pick_slip_${pickSlipData['pickSlipId']}');
+                              String response = await sendCsvAsEmail(csv,
+                                  'scan_verification_pick_slip_${pickSlipData['pickSlipId']}');
                               setState(() {
                                 scanVerificationMessage = response;
                                 isEmailSent = false;
@@ -222,7 +244,10 @@ class _ScanVerificationState extends State<ScanVerification> {
                             child: !isEmailSent
                                 ? const Text(
                                     'Finish Verification',
-                                    style: TextStyle(color: Colors.white, fontSize: 16.0, fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.bold),
                                   )
                                 : const CircularProgressIndicator(),
                           ),
@@ -366,7 +391,7 @@ class _ScanVerificationState extends State<ScanVerification> {
                       unitIdMessage,
                       style: TextStyle(
                           color: unitIdMessage !=
-                                      'unit id verified, continue with next line'
+                                  'unit id verified, continue with next line'
                               ? Colors.red
                               : Colors.green,
                           fontSize: 16.0,

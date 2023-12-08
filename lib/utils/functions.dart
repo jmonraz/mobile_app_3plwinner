@@ -109,9 +109,9 @@ Future<Map<String, dynamic>?> findPickSlip(
   }
 
   if (foundPickSlip == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Pick slip not found!')),
-    );
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   const SnackBar(content: Text('Pick slip not found!')),
+    // );
     return {};
   }
 
